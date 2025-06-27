@@ -1,6 +1,6 @@
 # Cross-Entropy in GPT Models
 
-> 🚧 **DRAFT — Work in Progress** 🚧  
+> **Draft — Work in Progress** 
 > Feedback and suggestions welcome!
 
 ## What is cross-entropy, and why is it central to machine learning?
