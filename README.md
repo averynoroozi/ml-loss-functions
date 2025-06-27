@@ -1,70 +1,38 @@
 # Cross-Entropy in GPT Models
 
-> **Draft — Work in Progress** 
-> Feedback and suggestions welcome!
+What is cross-entropy, and what makes it so central in machine learning?
 
-## What is cross-entropy, and why is it central to machine learning?
+Cross-entropy is a term that comes from information theory which describes a relationship between two probability distributions given a certain set of events. That is, the given set of events has probabilities assigned to each individual event in the set. 
 
-Cross-entropy is a concept from information theory that describes a relationship between two probability distributions over the same set of events. That is, the set contains individual events, each assigned a probability.
+We can think of it as follows:
 
-Let's illustrate this with an example:
+[dog, cat, fish] ← A set of 3 animals - dog, cat, and fish  
+We choose cat to be the correct token that we are 100% confident in.  
+Say p is the distribution such that we have a 0.0 probability assigned to selecting dog, a 1.0 probability assigned to selecting cat, and a 0.0 probability assigned to selecting fish, where q is the distribution with probabilities 0.2, 0.7, 0.1, respectively.
 
-Suppose we have a set of three animals: **[dog, cat, fish]**. We choose **cat** to be the correct token — meaning we are 100% confident in that choice.
+So, in this case, p is a “one-hot” vector: [0,1,0], representing the “correct” word choice for the model. Then q is the “guesses” by the model, guessing the probabilities for each token being the correct word choice. 
 
-- Let \( p \) be the true distribution:  
-  \[
-  p = [0.0, 1.0, 0.0]
-  \]  
-  This is called a *one-hot vector*, representing the correct word choice.
+In this example, the model is 70% confident in what turns out to be the right answer, which is pretty good. We should reward that, or at least give it precedence over a worse prediction. To do so, we use a loss function called cross-entropy.
 
-- Let \( q \) be the model’s predicted probabilities:  
-  \[
-  q = [0.2, 0.7, 0.1]
-  \]  
-  Here, the model guesses there’s a 70% chance the correct token is “cat.”
+We define the cross-entropy of the distribution q in relation to a distribution p as:
 
-Since the model is 70% confident in the correct answer, this prediction is pretty good. We want a way to reward better predictions and penalize worse ones. For this, we use a **loss function** called *cross-entropy*.
+$$
+H(p,q) = -E_p [\log q]
+$$
 
----
+So in the context of machine learning, the cross-entropy \(H(p,q)\) is the expected negative log probability that the model assigns to the true events. 
 
-Mathematically, cross-entropy is defined as:
+## Loss functions
 
-\[
-H(p, q) = -\mathbb{E}_{p}[\log q] = -\sum_{x} p(x) \log q(x)
-\]
+Cross-entropy is a type of loss function, and in this case, measures how bad the model’s prediction is compared to the true answer. Intuitively, a high cost will map to a high value, where a low cost will map to a low value. How does the given function act in the way that we want, though? If we take the graph of y = -log(x) (and in this case, the constant in front of log(q) will maintain the overall function behavior, as it is always positive):
 
-In this context, \( H(p, q) \) is the expected negative log probability that the model assigns to the true events.
 
----
 
-### Loss functions
+Since we only really care about how close the prediction for the correct selection is, notice that \(E_p\) will be 1 for the correct selection, but 0 for all other selections. That is, we only care about the “correct selection”, and the expression becomes
 
-Cross-entropy is a type of loss function — a function that measures how bad the model’s prediction is compared to the true answer. Intuitively, a higher loss means a worse prediction, and a lower loss means a better prediction.
+$$
+H(p,q) = -\log(q)
+$$
 
-To understand why the formula works, consider the graph of:
+Then, probabilities closer to 1 for the correct answer get rewarded with lower output values, where values closer to 0 for the correct answer get penalized with higher output values, which is essentially how the loss is represented here. 
 
-\[
-y = -\log(x)
-\]
-
-where \( x \) is a probability between 0 and 1.
-
----
-
-**Why this works:**  
-Since \( p \) is a one-hot vector, it selects only the correct token. That means the expectation \(\mathbb{E}_p\) evaluates to 1 for the correct token and 0 for all others. So the cross-entropy simplifies to:
-
-\[
-H(p, q) = -\log(q_{\text{correct}})
-\]
-
-- When \( q_{\text{correct}} \) is close to 1 (model is confident and correct), \( -\log(q_{\text{correct}}) \) approaches 0 — meaning low loss (good).
-- When \( q_{\text{correct}} \) is close to 0 (model is confident but wrong), the loss becomes very large — penalizing the model.
-
----
-
-This is essentially how GPT models learn: by adjusting their parameters to minimize cross-entropy loss, they become better at predicting the correct next token.
-
----
-
-*Feel free to open an issue or submit a pull request if you have suggestions or improvements!*
